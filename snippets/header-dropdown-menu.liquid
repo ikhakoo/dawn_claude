@@ -5,21 +5,33 @@
   - menu: {Object} Optional linklist to render. Defaults to section.settings.menu.
   - menu_id: {String} Optional unique key so multiple menus on one header don't collide. Defaults to 'primary'.
   - nav_class: {String} Optional class for the <nav>. Defaults to 'header__inline-menu'.
+  - side: {String} 'left' renders the first half of the links, 'right' the second half, 'all' (default) renders everything. Used to split one menu around a centered logo.
 
   Usage:
   {% render 'header-dropdown-menu' %}
-  {% render 'header-dropdown-menu', menu: section.settings.menu_secondary, menu_id: 'secondary', nav_class: 'header__inline-menu header__inline-menu--secondary' %}
+  {% render 'header-dropdown-menu', menu_id: 'right', side: 'right', nav_class: 'header__inline-menu header__inline-menu--secondary' %}
 {% endcomment %}
 
 {%- liquid
   assign menu_links = menu | default: section.settings.menu
   assign menu_id = menu_id | default: 'primary'
   assign nav_class = nav_class | default: 'header__inline-menu'
+  assign side = side | default: 'all'
+  assign half = menu_links.links.size | plus: 1 | divided_by: 2
 -%}
 
 <nav class="{{ nav_class }}">
   <ul class="list-menu list-menu--inline" role="list">
     {%- for link in menu_links.links -%}
+      {%- liquid
+        assign show_link = true
+        if side == 'left' and forloop.index0 >= half
+          assign show_link = false
+        elsif side == 'right' and forloop.index0 < half
+          assign show_link = false
+        endif
+      -%}
+      {%- if show_link -%}
       <li>
         {%- if link.links != blank -%}
           <header-menu>
@@ -110,6 +122,7 @@
           </a>
         {%- endif -%}
       </li>
+      {%- endif -%}
     {%- endfor -%}
   </ul>
 </nav>
