@@ -98,6 +98,64 @@
       padding-bottom: {{ section.settings.padding_bottom }}px;
     }
   }
+
+  {%- if section.settings.enable_pill_style -%}
+    .header-wrapper {
+      --color-background: 58, 44, 34;
+      --color-foreground: 243, 236, 228;
+      background: rgb(var(--color-background));
+      border-bottom: none;
+    }
+
+    .header {
+      border: 0.1rem solid rgba(var(--color-foreground), 0.3);
+      border-radius: 1.2rem;
+      background: rgba(var(--color-foreground), 0.04);
+      column-gap: 1rem;
+    }
+
+    .header__heading-link .h2,
+    .header__heading-link:hover .h2 {
+      color: rgb(var(--color-foreground));
+    }
+
+    .header__cart-label {
+      margin-left: 0.4rem;
+      font-size: 1.5rem;
+      color: rgba(var(--color-foreground), 0.85);
+    }
+
+    .header__icon--cart {
+      width: auto;
+    }
+
+    .header__inline-menu--secondary {
+      grid-area: auto;
+      margin-left: 0;
+      display: none;
+    }
+
+    @media screen and (min-width: 990px) {
+      .header--middle-center .header__inline-menu:not(.header__inline-menu--secondary) {
+        justify-self: end;
+      }
+
+      .header--middle-center
+        .header__inline-menu:not(.header__inline-menu--secondary)
+        > .list-menu--inline {
+        justify-content: flex-end;
+      }
+
+      .header__inline-menu--secondary {
+        display: block;
+      }
+
+      .header__icons {
+        align-items: center;
+        gap: 0.4rem;
+      }
+    }
+  {%- endif -%}
 {%- endstyle -%}
 
 <script src="{{ 'cart-notification.js' | asset_url }}" defer="defer"></script>
@@ -224,6 +282,13 @@
     {%- endif -%}
 
     <div class="header__icons{% if section.settings.enable_country_selector or section.settings.enable_language_selector %} header__icons--localization header-localization{% endif %}">
+      {%- if section.settings.menu_secondary != blank and section.settings.menu_type_desktop != 'drawer' -%}
+        {% render 'header-dropdown-menu',
+          menu: section.settings.menu_secondary,
+          menu_id: 'secondary',
+          nav_class: 'header__inline-menu header__inline-menu--secondary'
+        %}
+      {%- endif -%}
       <div class="desktop-localization-wrapper">
         {%- if section.settings.enable_country_selector and localization.available_countries.size > 1 -%}
           <localization-form class="small-hide medium-hide" data-prevent-hide>
@@ -247,7 +312,9 @@
           </localization-form>
         {%- endif -%}
       </div>
-      {% render 'header-search', input_id: 'Search-In-Modal' %}
+      {%- if section.settings.show_search_icon -%}
+        {% render 'header-search', input_id: 'Search-In-Modal' %}
+      {%- endif -%}
 
       {%- if shop.customer_accounts_enabled -%}
         <a
@@ -292,6 +359,9 @@
           <span class="svg-wrapper">{{ 'icon-cart.svg' | inline_asset_content }}</span>
         {% endif %}
         <span class="visually-hidden">{{ 'templates.cart.cart' | t }}</span>
+        {%- if section.settings.show_cart_label -%}
+          <span class="header__cart-label" aria-hidden="true">{{ 'templates.cart.cart' | t }}</span>
+        {%- endif -%}
         {%- if cart != empty -%}
           <div class="cart-count-bubble">
             {%- if cart.item_count < 100 -%}
@@ -517,7 +587,14 @@
       "type": "link_list",
       "id": "menu",
       "default": "main-menu",
-      "label": "t:sections.header.settings.menu.label"
+      "label": "t:sections.header.settings.menu.label",
+      "info": "Shown to the left of a centered logo."
+    },
+    {
+      "type": "link_list",
+      "id": "menu_secondary",
+      "label": "Secondary menu",
+      "info": "Shown to the right of a centered logo, before the cart."
     },
     {
       "type": "select",
@@ -568,6 +645,26 @@
       "id": "show_line_separator",
       "default": true,
       "label": "t:sections.header.settings.show_line_separator.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_pill_style",
+      "default": false,
+      "label": "Rounded bar style",
+      "info": "Adds a rounded bordered bar with a dark background to the header."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search_icon",
+      "default": true,
+      "label": "Show search icon"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart_label",
+      "default": false,
+      "label": "Show \"Cart\" label",
+      "info": "Displays a text label next to the cart icon."
     },
     {
       "type": "header",

@@ -12,17 +12,114 @@
   if section.blocks.size > 0
     assign announcement_bar = true
   endif
+
+  assign show_reviews = section.settings.show_reviews
+  assign show_contact = section.settings.show_contact
+
+  assign utility_left = false
+  if show_reviews or section.settings.show_social and social_icons
+    assign utility_left = true
+  endif
+
+  assign utility_right = false
+  if show_contact or language_country_selector
+    assign utility_right = true
+  endif
 -%}
 
 {% if social_icons %}
   {{ 'component-list-social.css' | asset_url | stylesheet_tag }}
 {% endif %}
 
+{%- style -%}
+  {%- if section.settings.enable_pill_style -%}
+    .utility-bar--pill {
+      --color-background: 58, 44, 34;
+      --color-foreground: 243, 236, 228;
+      background: rgb(var(--color-background));
+      color: rgb(var(--color-foreground));
+      border-bottom: none;
+    }
+
+    .utility-bar--pill .utility-bar__grid {
+      align-items: center;
+      min-height: 4.4rem;
+    }
+
+    .utility-bar--pill .announcement-bar__message {
+      font-weight: 700;
+      margin: 0;
+    }
+  {%- endif -%}
+
+  .utility-bar__reviews {
+    grid-area: social-icons;
+    display: none;
+    align-items: center;
+    gap: 0.8rem;
+    font-size: 1.4rem;
+  }
+
+  .utility-bar__reviews-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    text-decoration: none;
+  }
+
+  .utility-bar__stars {
+    letter-spacing: 0.1rem;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  .utility-bar__contact {
+    display: none;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 2rem;
+    font-size: 1.4rem;
+  }
+
+  .utility-bar__contact-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .utility-bar__contact-item .svg-wrapper {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+
+  @media screen and (min-width: 990px) {
+    .utility-bar__reviews,
+    .utility-bar__contact {
+      display: flex;
+    }
+  }
+{%- endstyle -%}
+
 <div
-  class="utility-bar color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator and section.blocks.size > 0 %} utility-bar--bottom-border{% elsif section.settings.show_line_separator and section.settings.show_social and social_icons%} utility-bar--bottom-border-social-only{% endif %}{% if section.settings.enable_country_selector or section.settings.enable_language_selector %} header-localization{% endif %}"
+  class="utility-bar color-{{ section.settings.color_scheme }} gradient{% if section.settings.enable_pill_style %} utility-bar--pill{% endif %}{% if section.settings.show_line_separator and section.blocks.size > 0 %} utility-bar--bottom-border{% elsif section.settings.show_line_separator and section.settings.show_social and social_icons%} utility-bar--bottom-border-social-only{% endif %}{% if section.settings.enable_country_selector or section.settings.enable_language_selector %} header-localization{% endif %}"
 >
-  <div class="page-width utility-bar__grid{% if announcement_bar and language_country_selector or section.settings.show_social and social_icons %} utility-bar__grid--3-col{% elsif language_country_selector or section.settings.show_social and social_icons %} utility-bar__grid--2-col{% endif %}">
-    {%- if section.settings.show_social and social_icons -%}
+  <div class="page-width utility-bar__grid{% if utility_left and utility_right %} utility-bar__grid--3-col{% elsif utility_left or utility_right %} utility-bar__grid--2-col{% endif %}">
+    {%- if show_reviews -%}
+      <div class="utility-bar__reviews">
+        {%- if section.settings.reviews_link != blank -%}
+          <a href="{{ section.settings.reviews_link }}" class="utility-bar__reviews-link link link--text focus-inset">
+        {%- endif -%}
+        <span class="utility-bar__stars" aria-hidden="true">★★★★★</span>
+        {%- if section.settings.reviews_text != blank -%}
+          <span class="utility-bar__reviews-text">{{ section.settings.reviews_text | escape }}</span>
+        {%- endif -%}
+        {%- if section.settings.reviews_link != blank -%}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- elsif section.settings.show_social and social_icons -%}
       {%- render 'social-icons' -%}
     {%- endif -%}
     {%- if section.blocks.size == 1 -%}
@@ -137,6 +234,28 @@
       {%- endif -%}
     {%- endif -%}
     <div class="localization-wrapper">
+      {%- if show_contact -%}
+        <div class="utility-bar__contact">
+          {%- if section.settings.message_label != blank -%}
+            <a
+              href="{{ section.settings.message_link | default: '#' }}"
+              class="utility-bar__contact-item link link--text focus-inset"
+            >
+              <span class="svg-wrapper">{{ 'icon-chat-bubble.svg' | inline_asset_content }}</span>
+              <span>{{ section.settings.message_label | escape }}</span>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.phone_number != blank -%}
+            <a
+              href="tel:{{ section.settings.phone_number | strip | replace: ' ', '' | replace: '-', '' | replace: '(', '' | replace: ')', '' }}"
+              class="utility-bar__contact-item link link--text focus-inset"
+            >
+              <span class="svg-wrapper">{{ 'icon-account.svg' | inline_asset_content }}</span>
+              <span>{{ section.settings.phone_number | escape }}</span>
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
       {%- if section.settings.enable_country_selector and localization.available_countries.size > 1 -%}
         <localization-form class="small-hide medium-hide">
           {%- form 'localization', id: 'AnnouncementCountryForm', class: 'localization-form' -%}
@@ -198,6 +317,63 @@
       "id": "show_line_separator",
       "default": true,
       "label": "t:sections.header.settings.show_line_separator.label"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_pill_style",
+      "default": false,
+      "label": "Rounded bar style",
+      "info": "Adds a dark background that matches the rounded header bar."
+    },
+    {
+      "type": "header",
+      "content": "Reviews"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reviews",
+      "default": false,
+      "label": "Show reviews",
+      "info": "Displayed on the left. Replaces social icons when enabled."
+    },
+    {
+      "type": "text",
+      "id": "reviews_text",
+      "label": "Reviews text",
+      "default": "4.8 / 5 stars 1133 reviews"
+    },
+    {
+      "type": "url",
+      "id": "reviews_link",
+      "label": "Reviews link"
+    },
+    {
+      "type": "header",
+      "content": "Contact"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contact",
+      "default": false,
+      "label": "Show contact",
+      "info": "Displayed on the right."
+    },
+    {
+      "type": "text",
+      "id": "message_label",
+      "label": "Message label",
+      "default": "Message Us"
+    },
+    {
+      "type": "url",
+      "id": "message_link",
+      "label": "Message link"
+    },
+    {
+      "type": "text",
+      "id": "phone_number",
+      "label": "Phone number",
+      "default": "+1 760-437-2452"
     },
     {
       "type": "header",

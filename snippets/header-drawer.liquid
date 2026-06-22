@@ -134,6 +134,24 @@
                 </li>
               {%- endfor -%}
             </ul>
+            {%- if section.settings.menu_secondary != blank -%}
+              <ul class="menu-drawer__menu has-submenu list-menu" role="list">
+                {%- for link in section.settings.menu_secondary.links -%}
+                  <li>
+                    <a
+                      id="HeaderDrawer-secondary-{{ link.handle }}"
+                      href="{{ link.url }}"
+                      class="menu-drawer__menu-item list-menu__item link link--text focus-inset{% if link.current %} menu-drawer__menu-item--active{% endif %}"
+                      {% if link.current %}
+                        aria-current="page"
+                      {% endif %}
+                    >
+                      {{ link.title | escape }}
+                    </a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
           </nav>
           <div class="menu-drawer__utility-links">
             {%- if shop.customer_accounts_enabled -%}
