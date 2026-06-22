@@ -100,18 +100,37 @@
   }
 
   {%- if section.settings.enable_pill_style -%}
+    {%- assign sticky_scheme = settings.color_schemes[section.settings.sticky_color_scheme] -%}
     .header-wrapper {
       --color-background: 58, 44, 34;
       --color-foreground: 243, 236, 228;
-      background: rgb(var(--color-background));
+      background: transparent;
       border-bottom: none;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
     }
 
+    /* Floating rounded bar */
     .header {
-      border: 0.1rem solid rgba(var(--color-foreground), 0.3);
-      border-radius: 1.2rem;
-      background: rgba(var(--color-foreground), 0.04);
+      margin-top: 1.2rem;
+      border: 0.1rem solid rgba(var(--color-foreground), 0.18);
+      border-radius: 1.6rem;
+      background: rgb(var(--color-background));
+      box-shadow: 0 0.6rem 2rem rgba(0, 0, 0, 0.18);
       column-gap: 1rem;
+      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease,
+        margin-top 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* On scroll: switch to the sticky color scheme, stay floating + pinned */
+    .scrolled-past-header .header {
+      {%- if sticky_scheme -%}
+        --color-background: {{ sticky_scheme.settings.background.red }}, {{ sticky_scheme.settings.background.green }}, {{ sticky_scheme.settings.background.blue }};
+        --color-foreground: {{ sticky_scheme.settings.text.red }}, {{ sticky_scheme.settings.text.green }}, {{ sticky_scheme.settings.text.blue }};
+      {%- endif -%}
+      margin-top: 1rem;
+      background: rgb(var(--color-background));
+      box-shadow: 0 0.4rem 1.6rem rgba(0, 0, 0, 0.28);
     }
 
     .header__heading-link .h2,
@@ -170,15 +189,22 @@
 
 {% liquid
   assign header_tag = 'div'
+  assign sticky_type = section.settings.sticky_header_type
 
-  if section.settings.sticky_header_type != 'none'
+  # The rounded bar style is designed to stay pinned, so force "always"
+  # regardless of the (editor-revertable) sticky_header_type setting.
+  if section.settings.enable_pill_style
+    assign sticky_type = 'always'
+  endif
+
+  if sticky_type != 'none'
     assign header_tag = 'sticky-header'
   endif
 %}
 
 <{{ header_tag }}
   {% if header_tag == 'sticky-header' %}
-    data-sticky-type="{{ section.settings.sticky_header_type }}"
+    data-sticky-type="{{ sticky_type }}"
   {% endif %}
   class="header-wrapper color-{{ section.settings.color_scheme }} gradient{% if section.settings.show_line_separator %} header-wrapper--border-bottom{% endif %}"
 >
@@ -637,7 +663,7 @@
           "label": "t:sections.header.settings.sticky_header_type.options__4.label"
         }
       ],
-      "default": "on-scroll-up",
+      "default": "always",
       "label": "t:sections.header.settings.sticky_header_type.label"
     },
     {
@@ -681,6 +707,13 @@
       "id": "menu_color_scheme",
       "label": "t:sections.header.settings.menu_color_scheme.label",
       "default": "scheme-1"
+    },
+    {
+      "type": "color_scheme",
+      "id": "sticky_color_scheme",
+      "label": "Sticky bar color (on scroll)",
+      "info": "Color the floating header switches to once the page is scrolled. Used with \"Rounded bar style\".",
+      "default": "scheme-3"
     },
     {
       "type": "header",
