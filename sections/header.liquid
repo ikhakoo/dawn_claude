@@ -76,6 +76,12 @@
   }
 </style>
 
+{%- liquid
+  # This header is purpose-built for the floating rounded bar design. Force it on
+  # regardless of the enable_pill_style setting, because the Shopify theme editor
+  # keeps writing that setting back to false and silently disabling the style.
+  assign use_pill_style = true
+-%}
 {%- style -%}
   .header {
     padding: {{ section.settings.padding_top | times: 0.5 | round: 0 }}px 3rem {{ section.settings.padding_bottom | times: 0.5 | round: 0 }}px 3rem;
@@ -99,7 +105,7 @@
     }
   }
 
-  {%- if section.settings.enable_pill_style -%}
+  {%- if use_pill_style -%}
     {%- assign sticky_scheme = settings.color_schemes[section.settings.sticky_color_scheme] -%}
     .header-wrapper {
       --color-background: 58, 44, 34;
@@ -193,7 +199,7 @@
 
   # The rounded bar style is designed to stay pinned, so force "always"
   # regardless of the (editor-revertable) sticky_header_type setting.
-  if section.settings.enable_pill_style
+  if use_pill_style
     assign sticky_type = 'always'
   endif
 
