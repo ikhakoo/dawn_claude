@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-{"name":"t:sections.header.name","type":"header","sections":{"announcement-bar":{"type":"announcement-bar","blocks":{"announcement-bar-0":{"type":"announcement","settings":{"text":"Click Here to Take a Quick 3-Minute Pergola Recommendation Quiz","link":""}}},"block_order":["announcement-bar-0"],"settings":{"auto_rotate":false,"change_slides_speed":5,"color_scheme":"scheme-1","show_line_separator":true,"enable_pill_style":true,"show_reviews":true,"reviews_text":"4.8 / 5 stars 1133 reviews","reviews_link":"","show_contact":true,"message_label":"Message Us","message_link":"","phone_number":"+1 760-437-2452","show_social":false,"enable_country_selector":false,"enable_language_selector":false}},"header":{"type":"header","settings":{"logo_position":"middle-center","mobile_logo_position":"center","menu":"main-menu","menu_secondary":"","menu_type_desktop":"dropdown","sticky_header_type":"on-scroll-up","show_line_separator":false,"enable_pill_style":true,"show_search_icon":false,"show_cart_label":true,"color_scheme":"scheme-1","menu_color_scheme":"scheme-1","enable_country_selector":false,"enable_language_selector":false,"enable_customer_avatar":true,"margin_bottom":0,"padding_top":20,"padding_bottom":20}}},"order":["announcement-bar","header"]}
-=======
 /*
  * ------------------------------------------------------------
  * IMPORTANT: The contents of this file are auto-generated.
@@ -33,11 +30,11 @@
         "change_slides_speed": 5,
         "color_scheme": "scheme-1",
         "show_line_separator": true,
-        "enable_pill_style": false,
-        "show_reviews": false,
+        "enable_pill_style": true,
+        "show_reviews": true,
         "reviews_text": "4.8 / 5 stars 1133 reviews",
         "reviews_link": "",
-        "show_contact": false,
+        "show_contact": true,
         "message_label": "Message Us",
         "message_link": "",
         "phone_number": "+1 760-437-2452",
@@ -52,9 +49,13 @@
         "logo_position": "middle-center",
         "mobile_logo_position": "center",
         "menu": "smart-3-0-desktop",
+        "menu_secondary": "",
         "menu_type_desktop": "dropdown",
         "sticky_header_type": "on-scroll-up",
         "show_line_separator": false,
+        "enable_pill_style": true,
+        "show_search_icon": false,
+        "show_cart_label": true,
         "color_scheme": "scheme-1",
         "menu_color_scheme": "scheme-1",
         "enable_country_selector": false,
@@ -71,4 +72,3 @@
     "header"
   ]
 }
->>>>>>> 5859b0bf37cc08c741e43526127f77f0b680286d
